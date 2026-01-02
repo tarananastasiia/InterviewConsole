@@ -72,7 +72,7 @@ namespace EmployeeService
 
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
