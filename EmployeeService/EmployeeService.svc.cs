@@ -18,9 +18,16 @@ namespace EmployeeService
         public EmployeeResponse GetEmployeeById(int id)
         {
             var employees = _employeeRepository.GetEmployeeById(id);
+
+            if (!employees.Any())
+            {
+                return new EmployeeResponse();
+            }
+
             var mainEmploee = employees.Find(x => x.Id == id);
+
             var result = MapResponse(mainEmploee);
-            FillSubEmployees(result, employees.ToLookup(x=> x.ManagerId));
+            FillSubEmployees(result, employees.ToLookup(x => x.ManagerId));
 
             return result;
         }

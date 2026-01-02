@@ -12,7 +12,7 @@ namespace EmployeeService
     {
         public void UpdateEnableFlag(int id, int enable)
         {
-            var query = $@"
+            var query = @"
                     UPDATE Employee
                     SET Enable={enable}
                     WHERE ID=@id";
@@ -27,9 +27,7 @@ namespace EmployeeService
 
         public List<Employee> GetEmployeeById(int id)
         {
-            try
-            {
-                var query = $@"
+            var query = @"
                     WITH EmployeeHierarchy AS
                     (
                         SELECT 
@@ -53,29 +51,23 @@ namespace EmployeeService
                         WHERE CHARINDEX(',' + CAST(e.ID AS VARCHAR) + ',', ',' + eh.Path + ',') = 0
                     )
                     SELECT ID, Name, ManagerID, Enable
-                    FROM EmployeeHierarchy
-                    ORDER BY ManagerID, ID";
+                    FROM EmployeeHierarchy";
 
-                var parameters = new SqlParameter[]
-                {
-                    new SqlParameter("@id", id)
-                };
-
-                var employeesDataTable = GetQueryResult(query, parameters);
-
-                var result = employeesDataTable.AsEnumerable().Select(x => new Employee
-                {
-                    Id = x.Field<int>("Id"),
-                    Name = x.Field<string>("Name"),
-                    ManagerId = x.Field<int?>("ManagerId")
-                }).ToList();
-
-                return result;
-            }
-            catch (Exception)
+            var parameters = new SqlParameter[]
             {
-                throw;
-            }
+                    new SqlParameter("@id", id)
+            };
+
+            var employeesDataTable = GetQueryResult(query, parameters);
+
+            var result = employeesDataTable.AsEnumerable().Select(x => new Employee
+            {
+                Id = x.Field<int>("Id"),
+                Name = x.Field<string>("Name"),
+                ManagerId = x.Field<int?>("ManagerId")
+            }).ToList();
+
+            return result;
         }
 
         private static DataTable GetQueryResult(string query, SqlParameter[] parameters = null)
